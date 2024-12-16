@@ -3,6 +3,11 @@ var router = express.Router();
 const multer  = require('multer');
 const path = require('path');
 
+const uploadDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true }); 
+}
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, 'uploads')
@@ -37,16 +42,11 @@ router.get('/', function(req, res, next) {
     res.redirect('form.html');
 });
 
-//router.post('/', upload.single('avatar'), function (req, res, next) {
-//    console.log(req.file.filename)
-
-//    res.send("Jasota")
-//})
 
 router.post('/', upload.single('avatar'), function (req, res, next) {
     const izena = req.body.izena; 
-    console.log('X-Forwarded-Host:', req.get('X-Forwarded-Host'));
-    const baseUrl = `${req.protocol}://${req.get('X-Forwarded-Host')}`; // Calcular dinámicamente la URL base
+    const host = req.get('X-Forwarded-Host') || req.get('Host');
+    const baseUrl = `${req.protocol}://${host}`; 
     const fileUrl = `${baseUrl}/uploads/${req.file.filename}`; 
 
     
